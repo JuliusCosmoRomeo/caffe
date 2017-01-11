@@ -1009,7 +1009,9 @@ Label = {0: 'tench, Tinca tinca',
 
 
 jsonDataSwapped = dict()
-with io.open("../../ILSVRC2012_metadata.json") as metadataFile:
+#metadataPath = "../../ILSVRC2012_metadata.json"
+metadataPath = "../../../workspace/ILSVRC2012_metadata.json"
+with io.open(metadataPath) as metadataFile:
 	#jsonFile = json.open(metadataFile)
 	#jsonString = jsonFile.read()
 	jsonData = json.load(metadataFile)
@@ -1019,7 +1021,9 @@ with io.open("../../ILSVRC2012_metadata.json") as metadataFile:
 imageQueue = dict()
 categoryDict = dict()
 doc = None
-with open("../../../../../../../media/sf_CNNs/ILSVRC2012.yaml") as yamlFile:
+#yamlFilePath = "../../../../../../../media/sf_CNNs/ILSVRC2012.yaml"
+yamlFilePath = "../../../workspace/ILSVRC2012.yaml"
+with open(yamlFilePath) as yamlFile:
 	doc = yaml.load(yamlFile)
 	
 	for cat in doc["val"]["gt"]:
