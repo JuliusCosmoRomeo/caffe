@@ -34,10 +34,11 @@ RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/BVLC/caffe.git . && \
     mkdir build && cd build && \
     cmake -DCPU_ONLY=1 .. && \
     make -j"$(nproc)"
-
+RUN cd opt/caffe ; python scripts/download_model_binary.py models/bvlc_alexnet
 ENV PYCAFFE_ROOT $CAFFE_ROOT/python
 ENV PYTHONPATH $PYCAFFE_ROOT:$PYTHONPATH
 ENV PATH $CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
 RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 
 WORKDIR /workspace
+ENTRYPOINT [ "/bin/bash" ]
