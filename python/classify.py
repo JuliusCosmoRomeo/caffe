@@ -2,7 +2,7 @@
 """
 classify.py is an out-of-the-box image classifer callable from the command line.
 
-By default it configures and runs the Caffe reference ImageNet model.
+By default it configures and runs the Alexnet ImageNet model.
 """
 import numpy as np
 import os
@@ -31,13 +31,13 @@ def main(argv):
     parser.add_argument(
         "--model_def",
         default=os.path.join(pycaffe_dir,
-                "../models/bvlc_reference_caffenet/deploy.prototxt"),
+                "../models/bvlc_alexnet/deploy.prototxt"),
         help="Model definition file."
     )
     parser.add_argument(
         "--pretrained_model",
         default=os.path.join(pycaffe_dir,
-                "../models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel"),
+                "../models/bvlc_alexnet/bvlc_alexnet.caffemodel"),
         help="Trained model weights file."
     )
     parser.add_argument(

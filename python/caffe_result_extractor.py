@@ -2,6 +2,9 @@ import numpy
 import json
 import sys
 import io
+import os
+import time
+import re
 import yaml
 Label = {0: 'tench, Tinca tinca',
  1: 'goldfish, Carassius auratus',
@@ -1026,38 +1029,65 @@ with open("../../../../../../../media/sf_CNNs/ILSVRC2012.yaml") as yamlFile:
 		imageQueue[img] = doc["val"]["images"][img]
 	yamlFile.close()
 
-for img in imageQueue:
-	print(img + " " + imageQueue[img])
-print("done")
-print(doc["val"]["gt"]["n13052670"])
-#for every image
-
-
-
+imageQueue = sorted(imageQueue)
 
 
 out = numpy.load(sys.argv[1])
 
 hashmap = dict()
-#i=1
+allClassifiedFiles = 0
+allCorrectFiles = 0
+classNotFound = 0
 #for date in data:
 #print("predicted class: "+ Label[data[0].argmax()] + " with value " + str(data[0][data[0].argmax()]))
-top5_indices = out[0].argsort()[-5:][::-1]
+"""fileNames = list()
+imgDirectoryPath = "../../../../../../../media/sf_CNNs/images"
+for file in os.listdir(imgDirectoryPath):
+    if file.endswith(".JPEG"):
+	fileNames.append(file)
 
-for index in top5_indices:	
-	labelForIndex = Label[index]
-	print("predicted class: " + labelForIndex + " with value " + str(out[0][index]))
-	print(jsonDataSwapped[labelForIndex])
+def atoi(text):
+    return int(text) if text.isdigit() else text
+
+def natural_keys(text):
+    '''
+    alist.sort(key=natural_keys) sorts in human order
+    http://nedbatchelder.com/blog/200712/human_sorting.html
+    (See Toothy's implementation in the comments)
+    '''
+    return [ atoi(c) for c in re.split('(\d+)', text) ]
 
 
+fileNames.sort(key=natural_keys)
+print(fileNames)"""
 
-#for index in top5_indices:	
-#	print("predicted class: " + Label[index] + " with value " + str(out[0][index]))
+for img in out:
 
+	start = time.time()
+	fileId = allClassifiedFiles
+	allClassifiedFiles+=1
+	top5_indices = img.argsort()[-5:][::-1]
+	files_in_top5_category = set()
+	for index in top5_indices:	
+		labelForIndex = Label[index]		
+		print(str(fileId) + " predicted class: " + labelForIndex + " with value " + str(img[index]))
+		if not labelForIndex in jsonDataSwapped:
+			classNotFound += 1
+			continue		
+		categoryId = jsonDataSwapped[labelForIndex]
+		print(categoryId + " " + labelForIndex)
+		if categoryId in categoryDict:
+			for fId in categoryDict[categoryId]:
+				files_in_top5_category.add(int(fId))
+	if int(fileId) in files_in_top5_category:
+		print("found correct class")
+		allCorrectFiles +=1
+	else:
+		print("did not find correct class")
+		correctCatFound = False
+	print("all classified images " + str(allClassifiedFiles))
+	print("all correct images " + str(allCorrectFiles))
+	print("not found classes " + str(classNotFound))
+	print("time for last img: " + str(time.time()-start))
 
-#with open("results.txt","w") as outfile:
-#	for date in out:
-#		date = reversed(sorted(date))
-#		for inst in date:
-#			outfile.write(str(inst) + "\n")
 
