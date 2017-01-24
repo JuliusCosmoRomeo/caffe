@@ -126,12 +126,16 @@ def main(argv):
 
     # Classify.
     start = time.time()
-    predictions = classifier.predict(inputs, not args.center_only)
+    #predictions = list()
+    for input_img in inputs:
+	    prediction = classifier.predict(input_img, not args.center_only)
+	    print(top_n_error_rate(5, prediction, "../../../ILSVRC2012.yaml", 1))
+	    #predictions.append(prediction)
     print("Done in %.2f s." % (time.time() - start))
 
     # Save
     print("Saving results into %s" % args.output_file)
-    np.save(args.output_file, predictions)
+    #np.save(args.output_file, predictions)
 
 
 if __name__ == '__main__':
