@@ -10,10 +10,8 @@ import sys
 import argparse
 import glob
 import time
-from string_sorter import sort_list_natural
 
 import caffe
-from top_n_error_rate import ErrorRateCalculator
 
 
 def main(argv):
@@ -120,46 +118,31 @@ def main(argv):
         print("Loading folder: %s" % args.input_file)
 	for im_f in glob.glob(args.input_file + '/*.' + args.ext):
 	    print("file name " + im_f)
-	input_files = glob.glob(args.input_file + '/*.' + args.ext)
-	input_files_sorted = sort_list_natural(input_files)
         inputs =[caffe.io.load_image(im_f)
-                 for im_f in input_files_sorted]
-	for im_f in input_files_sorted:
-	    print("file name " + im_f)
-	
+                 for im_f in glob.glob(args.input_file + '/*.' + args.ext)]
     else:
         print("Loading file: %s" % args.input_file)
         inputs = [caffe.io.load_image(args.input_file)]
 
     print("Classifying %d inputs." % len(inputs))
-    batch_size = 10
+    batch_size = 100
     i = 0
     # Classify.
     start = time.time()
-    correct_images = 0
-    n = 5
-    error_rate_calc = ErrorRateCalculator("../../../workspace/ILSVRC2012.yaml")
+    #predictions = list()
     while (i+1)*batch_size < len(inputs):
-        print("classifying inputs from " + str(i*batch_size) + " to " + str((i+1) * batch_size))
-        img_start = time.time()
-        prediction = classifier.predict(inputs[i*batch_size:(i+1)*batch_size], oversample=False)
-        print("Time for last 10 images " + str(time.time() - img_start))
-        error_rate = error_rate_calc.top_n_error_rate(n, prediction, range(i*batch_size,(i+1)*batch_size))
-        print(str(error_rate))
-        correct_images+= (error_rate * batch_size)
-        print("Top " + str(n) + " error rate: " + str(float(correct_images)/float((i+1)*batch_size)))
-        i=i+1
-    prediction = classifier.predict(inputs[i*batch_size:len(inputs)], oversample=False)
-    error_rate = error_rate_calc.top_n_error_rate(n, prediction, range(i*batch_size,len(inputs)))
-    print(str(error_rate))
-    last_images = len(inputs) - (i* batch_size)
-    correct_images+= (error_rate * last_images)
+	    print("classifiing inputs from " + i*batch_size + " to " + (i+1) * batch_size)
+	    prediction = classifier.predict(inputs[i*batch_size:(i+1)*batch_size], not args.center_only)
+	    print(top_n_error_rate(5, prediction, "../../../ILSVRC2012.yaml", range(i*batch_size,(i+1)*batch_size))
+	    i+=1
+    prediction = classifier.predict(inputs[i*batch_size:len(inputs)], not args.center_only)
+    print(top_n_error_rate(5, prediction, "../../../ILSVRC2012.yaml", range(i*batch_size,len(inputs))
+	    
     print("Done in %.2f s." % (time.time() - start))
-    print("All correct imgs " + str(correct_images))
-    print("All imgs " + str(len(inputs)))
-    print("Total top " + str(n) + " error rate: " + str(float(correct_images)/float(len(inputs))))
-    start_time = time.time()
-    
+
+    # Save
+    print("Saving results into %s" % args.output_file)
+    #np.save(args.output_file, predictions)
 
 
 if __name__ == '__main__':
